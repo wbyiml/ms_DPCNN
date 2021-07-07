@@ -19,12 +19,12 @@ resourece <br />
 glove embedding文件：https://pan.baidu.com/s/14BvOavIY0IqMfbJlU0_rZw <br /> 
 提取码：nyxg   <br />  <br /> 
 
-预训练模型存放于pretrained目录（使用aclimdb数据集预训练）：   <br /> 
-提取码：   <br />  <br /> 
 
 
 训练：
 CUDA_VISIBLE_DEVICES=0 python train.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B  <br /> 
+使用预训练模型训练：
+CUDA_VISIBLE_DEVICES=0 python train.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B --pretrained pretrained/aclimdb.ckpt  <br /> 
 评估：
 CUDA_VISIBLE_DEVICES=0 python eval.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B --ckpt_path outputs/dpcnn-20_149.ckpt
  <br />  <br /> 
