@@ -26,7 +26,7 @@ CUDA_VISIBLE_DEVICES=0 python train.py --device_target GPU --data_path ./resourc
 CUDA_VISIBLE_DEVICES=0 python eval.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B --ckpt_path outputs/dpcnn-20_149.ckpt
  <br />  <br /> 
 
-使用预训练模型进行调优，训练结果精度：
-
+使用预训练模型进行调优，训练结果精度：  <br /> 
+（预训练aclimdb lr0.01  微调rt-polaritydata lr0.0001）
 
 
