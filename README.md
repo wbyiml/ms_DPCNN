@@ -19,7 +19,8 @@ resourece <br />
 glove embedding文件：https://pan.baidu.com/s/14BvOavIY0IqMfbJlU0_rZw <br /> 
 提取码：nyxg   <br />  <br /> 
 
-
+预训练模型：https://pan.baidu.com/s/1LGL1_N75HDO3VHmFchY7UA <br /> 
+提取码：zrs1   <br />  <br />
 
 训练：
 CUDA_VISIBLE_DEVICES=0 python train.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B  <br /> 
@@ -30,6 +31,8 @@ CUDA_VISIBLE_DEVICES=0 python eval.py --device_target GPU --data_path ./resource
  <br />  <br /> 
 
 使用预训练模型进行调优，训练结果精度：  <br /> 
-（预训练aclimdb lr0.01  微调rt-polaritydata lr0.0001）
+结果模型：https://pan.baidu.com/s/1bd3vi6Z4kq4LzmA7LQL1LA <br /> 
+提取码：mic9   <br />  <br />
+
 
 
