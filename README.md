@@ -16,6 +16,9 @@ resourece <br />
 ————test.txt      makeDataset.py生成 <br />  <br /> 
 
 
+glove embedding文件：https://pan.baidu.com/s/14BvOavIY0IqMfbJlU0_rZw <br /> 
+提取码：nyxg   <br />  <br /> 
+
 预训练模型存放于pretrained目录（使用aclimdb数据集预训练）：   <br /> 
 提取码：   <br />  <br /> 
 
