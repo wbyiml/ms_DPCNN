@@ -25,16 +25,20 @@ class RTDataset:
         self.seq_len = seq_len
         self.embed_size = embed_size
 
-        if os.path.isfile(os.path.join(data_path, 'processed/train.json')) and  os.path.isfile(os.path.join(data_path, 'processed/test.json')):
+        if os.path.isfile(os.path.join(data_path, 'processed/train.json')) and \
+           os.path.isfile(os.path.join(data_path, 'processed/test.json')) and \
+           os.path.isfile(os.path.join(data_path, 'processed/vocab.json')) and \
+           os.path.isfile(os.path.join(data_path, 'processed', 'weight_'+str(embed_size)+'d.txt')):
             print('datasets already processed.')
         else:
-            parser = DatasetParser(data_path, glove_path)
+            parser = DatasetParser(data_path, glove_path, embed_size)
             parser.parse()
 
 
-        print('loading gensim wvmodel')
-        glove_file = os.path.join(glove_path, 'glove.6B.'+str(self.embed_size)+'d.txt')
-        self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(glove_file)
+        # print('loading gensim wvmodel')
+        # glove_file = os.path.join(glove_path, 'glove.6B.'+str(self.embed_size)+'d.txt')
+        # self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(glove_file)
+        
         # print('loading glove twitter')
         # glove_twitter_file = os.path.join(glove_path,'glove-twitter-25')
         # if os.path.isfile(glove_twitter_file):
@@ -45,7 +49,6 @@ class RTDataset:
         #     self.twittermodel = gensimapi.load('glove-twitter-25') 
 
 
-        # Now load the picked data.
         
         if self.is_train:
             with open(os.path.join(data_path, 'processed','train.json'),'r') as f:
@@ -55,6 +58,9 @@ class RTDataset:
                 datadict = json.load(f)
         self.datas = datadict['lines']
         self.labels = datadict['labels']
+
+        with open(os.path.join(data_path, 'processed','vocab.json'),'r') as f:
+            self.vocab = json.load(f)
    
 
     def __getitem__(self, index):
@@ -78,33 +84,39 @@ class RTDataset:
             cut_sentence = sentence
 
 
-        features = np.zeros( ( 1,self.seq_len,self.embed_size ), dtype=np.float32 )
+        sentence_ids = np.zeros(self.seq_len, dtype=np.int32 )
         for i,word in enumerate(cut_sentence):
-            if self.is_train:
-                if random.random() < 0.2:
-                    syn  = wn.synsets(word)
-                    if len(syn)!=0:
-                        word = random.choice( syn[0].lemma_names() )   # pre
+            # if self.is_train:
+            #     if random.random() < 0.4:
+            #         syn  = wn.synsets(word)
+            #         if len(syn)!=0:
+            #             word = random.choice( syn[0].lemma_names() )   # pre
 
-                # if random.random() < 0.2:
-                #     try:
-                #         # word = random.choice(self.twittermodel.most_similar(word, topn=5))[0]
-                #         word = random.choice(self.__wvmodel.most_similar(word, topn=5))[0]           
-                #     except:
-                #         pass
+            #     if random.random() < 0.4:
+            #         try:
+            #             # word = random.choice(self.twittermodel.most_similar(word, topn=5))[0]
+            #             word = random.choice(self.__wvmodel.most_similar(word, topn=5))[0]           
+            #         except:
+            #             pass
             
             # word 2 vec
-            if word in self.__wvmodel:
-                word_vector = self.__wvmodel.get_vector(word)
-                features[0,i, :] = word_vector
+            sentence_ids[i] = self.vocab.get(word, 0)
 
-        if self.is_train:
-            if random.random() < 0.2:
-                swapids = random.sample( range(self.seq_len), random.choice(range(10+1)) )
-                features[0,sorted(swapids), :] = features[0,swapids, :]
+        # if self.is_train:
+        #     if random.random() < 0.4: # 乱序
+        #         length = len(sentence) if len(sentence) < self.seq_len else self.seq_len
+        #         swapids = random.sample( range(length), random.choice(range(length+1)) )
+        #         sentence_ids[sorted(swapids)] = sentence_ids[swapids]
+            
+        #     if random.random() < 0.4: # cutout
+        #         length = len(sentence) if len(sentence) < self.seq_len else self.seq_len
+        #         cutids = random.sample( range(length), random.choice(range(int(length/4)+1)) )
+        #         sentence_ids[cutids] = 0
+        
+
 
         
-        return features, label
+        return sentence_ids, label
 
     def __len__(self):
         """Length of the dataset.
@@ -121,10 +133,10 @@ def create_dataset(batch_size, data_path, glove_path,seq_len,embed_size, is_trai
 
     dataset_generator = RTDataset(data_path, glove_path,seq_len,embed_size, is_train)
 
-    dataset = ds.GeneratorDataset(dataset_generator, ["sentence_vec", "label"], shuffle=True)
+    dataset = ds.GeneratorDataset(dataset_generator, ["sentence", "label"], shuffle=True)
 
     dataset = dataset.shuffle(buffer_size=dataset.get_dataset_size())
     dataset = dataset.batch(batch_size=batch_size, drop_remainder=True)
     dataset = dataset.repeat(count=1)
 
-    return dataset
+    return dataset, len(dataset_generator.vocab)

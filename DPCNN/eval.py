@@ -15,7 +15,7 @@ from src.dpcnn import DPCNN
 
 
 
-# CUDA_VISIBLE_DEVICES=0 python eval.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B --ckpt_path outputs/dpcnn-6_149.ckpt
+# CUDA_VISIBLE_DEVICES=0 python eval.py --device_target GPU --data_path ./resource/rt-polaritydata --glove_path ./resource/glove.6B --ckpt_path outputs/dpcnn-20_149.ckpt
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MindSpore LSTM Example')
@@ -33,14 +33,16 @@ if __name__ == '__main__':
     
     cfg = dpcnn_cfg
 
-    ds_eval = create_dataset(cfg.batch_size, args.data_path, args.glove_path, cfg.seq_len, cfg.embed_size, is_train=False)
+    ds_eval,vocab_size = create_dataset(cfg.batch_size, args.data_path, args.glove_path, cfg.seq_len, cfg.embed_size, is_train=False)
 
-
+    weight_path = os.path.join(args.data_path, 'processed', 'weight_'+str(cfg.embed_size)+'d.txt')
     network = DPCNN(seq_len=cfg.seq_len,
                     embed_size=cfg.embed_size,
                     hid_channels=cfg.hid_channels,
                     kernelsize=cfg.kernelsize,
-                    num_classes=cfg.num_classes)
+                    num_classes=cfg.num_classes,
+                    weight_path = weight_path,
+                    vocab_size = vocab_size)
 
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
