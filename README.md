@@ -1,7 +1,7 @@
-# ms_task1
+# ms_DPCNN
 
-## wbyiml/ms_task1 
-
+## wbyiml/ms_DPCNN
+利用MindSpore实现DPCNN文本分类网络
 
 数据集存放在resource目录内 <br />
 使用resource/makeDataset.py将数据集转换为train.txt, test.txt <br /> 
